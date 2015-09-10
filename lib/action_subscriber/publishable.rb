@@ -47,7 +47,8 @@ module ActionSubscriber
         def publish(operation)
           channel = ActionSubscriber::RabbitConnection.connection.create_channel
           exchange = channel.topic(exchange_name)
-          exchange.publish(self.to_json, :routing_key => generate_routing_key_name(operation))
+          exchange.publish(self.to_json, :routing_key => generate_routing_key_name(operation), 
+                                         :content_type => 'application/json')
         end
 
         def publish_created_event
