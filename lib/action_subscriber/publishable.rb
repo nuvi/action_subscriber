@@ -3,9 +3,9 @@ module ActionSubscriber
 
     def self.included(base)
       base.class_eval do
-        after_create  :publish_created_event
-        after_destroy :publish_deleted_event
-        after_save    :publish_event
+        after_commit :publish_created_event,   :on => :create
+        after_commit :publish_destroyed_event, :on => :destroy
+        after_commit :publish_updated_event,   :on => :update
 
         def generate_routing_key_name(method_name)
           [
@@ -44,31 +44,24 @@ module ActionSubscriber
           @_local_application_name
         end
 
-        def publish_created_event
-          publish(:created)
-          true
-        end
-
-        def publish_destroyed_event
-          publish(:deleted)
-          true
-        end
-
-        def publish_event
-          operation = :created
-          operation = :updated unless self.new_record?
-          operation = :deleted if     self.destroyed?
-
-          publish(operation)
-
-          true
-        end
-
         def publish(operation)
           channel = ActionSubscriber::RabbitConnection.connection.create_channel
           exchange = channel.topic(exchange_name)
           exchange.publish(self.to_json, :routing_key => generate_routing_key_name(operation))
         end
+
+        def publish_created_event
+          publish(:created)
+        end
+
+        def publish_destroyed_event
+          publish(:deleted)
+        end
+
+        def publish_updated_event
+          publish(:updated)
+        end
+
 
         def resource_name
           self.class.name.underscore
