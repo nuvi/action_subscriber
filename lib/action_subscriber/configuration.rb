@@ -1,6 +1,7 @@
 module ActionSubscriber
   class Configuration
     attr_accessor :allow_low_priority_methods,
+                  :connection_string,
                   :decoder,
                   :default_exchange,
                   :error_handler,
