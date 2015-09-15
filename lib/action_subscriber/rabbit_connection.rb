@@ -62,7 +62,6 @@ module ActionSubscriber
     def self.connection_options
       ::ActionSubscriber.configuration.connection_string.present? ? connection_string : connection_params
     end
-    private_class_method :connection_options
 
     def self.connection_params
       {
@@ -75,13 +74,10 @@ module ActionSubscriber
         :recover_from_connection_close => true,
       }
     end
-    private_class_method :connection_params
 
     def self.connection_string
       ::AMQ::Settings.parse_amqp_url(::ActionSubscriber.configuration.connection_string)
     end
-    
-    private_class_method :connection_string
 
   end
 end
